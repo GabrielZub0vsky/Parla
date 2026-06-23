@@ -57,6 +57,12 @@ public class Words {
         }
     }
 
+    public void decrementLookupCount(int index) {
+        if (index >= 0 && index < lookupCounts.size()) {
+            lookupCounts.set(index, Math.max(0, lookupCounts.get(index) - 1));
+        }
+    }
+
     public String[] getQuizWords(int quizSize) {
         if (words.isEmpty()) {
             return new String[0];

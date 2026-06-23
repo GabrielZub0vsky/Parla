@@ -4,77 +4,80 @@ public class Main {
     public static void main(String[] args) {
         Words words = new Words();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to Parla, your personal language learning assistant!");
 
         while(true) {
-            System.out.println("\nPlease type W if you wish to add words, T to translate a word, Q for a quiz, or E to exit: ");
-            char mode = scanner.next().charAt(0);
+            System.out.print("\n> ");
+            String cmd = scanner.next();
 
-            if (mode == 'W') {
-                System.out.println("\nYou have selected word mode.\n");
-                for (int i = 0; i < 5; i++) {
-                    System.out.println("Enter a language, a word in that language, and its English translation, all separated by 1 space:\n");
-                    String language = scanner.next();
-                    String foreignWord = scanner.next();
-                    String englishTranslation = scanner.next();
-                    if (words.isValid(foreignWord) && words.isValid(englishTranslation)) {
-                        System.out.println("Valid word + translation added! (" + (i + 1) + "/5)\n");
-                        words.addWord(language, foreignWord, englishTranslation);
-                    } else {
-                        System.out.println("Invalid word, please enter a valid English word and its valid translation, separated by 1 space: \n");
-                    }
-                }
-            } else if (mode == 'T') {
-                System.out.println("\nYou have selected translation mode.\n");
-                System.out.println("Enter a foreign word to translate: ");
-                String wordToTranslate = scanner.next();
-                String translation = words.lookupWord(wordToTranslate);
-                if (translation != null) {
-                    String language = words.getLanguageOfWord(wordToTranslate);
-                    System.out.println("Translate " + wordToTranslate + " from " + language + " to english:\n");
-                    System.out.println(translation + "\n");
-                } else {
-                    System.out.println("Word not found in database. Returning to main menu...\n");
-                }
-            } else if (mode == 'Q') {
-                System.out.println("\nYou have selected quiz mode.\n");
-                String[] quizWords = words.getQuizWords(5);
-                
-                if (quizWords.length == 0) {
-                    System.out.println("Not enough words to create a quiz. Please add more words first. Returning to main menu...\n");
-                } else {
-                    int correctCount = 0;
-                    for (String quizItem : quizWords) {
-                        String[] parts = quizItem.split("\\|");
-                        String foreignWord = parts[0];
-                        String correctTranslation = parts[1];
-                        
-                        System.out.println("Translate: " + foreignWord);
-                        String userAnswer = scanner.next();
-                        
-                        if (userAnswer.equalsIgnoreCase(correctTranslation)) {
-                            System.out.println("Correct!\n");
-                            correctCount++;
+            switch (cmd) {
+                case "add":
+                    for (int i = 0; i < 5; i++) {
+                        String language = scanner.next();
+                        String foreignWord = scanner.next();
+                        String englishTranslation = scanner.next();
+                        if (words.isValid(foreignWord) && words.isValid(englishTranslation)) {
+                            words.addWord(language, foreignWord, englishTranslation);
                         } else {
-                            System.out.println("Incorrect. The correct translation is: " + correctTranslation);
-                            int wordIndex = Integer.parseInt(parts[2]);
-                            words.incrementLookupCount(wordIndex);
-                            System.out.println();
+                            System.out.println("Please enter a language, a word in that language, and its English translation, separated by 1 space: \n");
                         }
                     }
-                    System.out.println("Quiz complete! You got " + correctCount + " out of " + quizWords.length + " correct. Returning to main menu...\n");
-                    words.addQuizScore(correctCount);
-                }
-            } else if (mode == 'E') {
-                System.out.println("\nThank you for using Parla. Saving your progress...\n");
-                words.saveData();
-                System.out.println("Goodbye!\n");
-                break;
-            } else {
-                System.out.println("Invalid input, please enter W, T, Q, or E\n");
+                    continue;   
+                case "translate":
+                    String wordToTranslate = scanner.next();
+                    String translation = words.lookupWord(wordToTranslate);
+                    if (translation != null) {
+                        String language = words.getLanguageOfWord(wordToTranslate);
+                        System.out.println("The English translation of " + wordToTranslate + " (" + language + ") is: " + translation + "\n"); 
+                    } else {
+                        System.out.println("Word not found in database.\n");
+                    }
+
+                case "quiz":
+                    int numQuestions = scanner.nextInt();
+                    String[] quizWords = words.getQuizWords(numQuestions);
+                    
+                    if (quizWords.length < 1) {
+                        System.out.println("Not enough words to create a quiz.\n");
+                    } else {
+                        int correctCount = 0;
+                        for (String quizItem : quizWords) {
+                            String[] parts = quizItem.split("\\|");
+                            String foreignWord = parts[0];
+                            String correctTranslation = parts[1];
+                            
+                            System.out.println("Translate: " + foreignWord);
+                            String userAnswer = scanner.next();
+                            
+                            if (userAnswer.equalsIgnoreCase(correctTranslation)) {
+                                System.out.println("Correct!\n");
+                                correctCount++;
+                            } else {
+                                System.out.println("Incorrect. The correct translation is: " + correctTranslation + "\n");
+                                int wordIndex = Integer.parseInt(parts[2]);
+                                words.incrementLookupCount(wordIndex);
+                            }
+                        }
+                        System.out.println("Quiz complete! (" + correctCount + "/" + quizWords.length + ")\n");
+                        words.addQuizScore(correctCount);
+                    }
+                    continue;
+                case "exit":
+                    System.out.println("\nSaving progress...\n");
+                    words.saveData();
+                    scanner.close();
+                    break;
+                case "help":
+                    System.out.println("Available commands:");
+                    System.out.println("add [<language>] [<foreign_word>] [<english_translation>] - Add new words to the database.");
+                    System.out.println("translate [<foreign_word>] - Translate a foreign word to English.");
+                    System.out.println("quiz [<number_of_questions>] - Take a quiz on the words in the database.");
+                    System.out.println("exit - Save progress and exit the program.");
+                    System.out.println("help - Show this help message.");
+                    continue;
+                default:
+                    System.out.println("Invalid command. Run help to see commands.\n");
+                    continue;
             }
         }
-        
-        scanner.close();
     }
 }
