@@ -13,10 +13,10 @@ public class Main {
                 case "add":
                     while(true) {
                         String language = scanner.next();
-                        String foreignWord = scanner.next();
-                        String englishTranslation = scanner.next();
-                        if (words.isValid(foreignWord) && words.isValid(englishTranslation)) {
-                            words.addWord(language, foreignWord, englishTranslation);
+                        String foreign = scanner.next();
+                        String english = scanner.next();
+                        if (words.isValid(foreign) && words.isValid(english)) {
+                            words.addWord(language, foreign, english);
                         } else {
                             System.out.println("Invalid input.\n");
                             scanner.nextLine(); // Clear the invalid input
@@ -25,11 +25,11 @@ public class Main {
                     }
                     continue;   
                 case "translate":
-                    String wordToTranslate = scanner.next();
-                    String translation = words.lookupWord(wordToTranslate);
+                    String foreignWord = scanner.next();
+                    String translation = words.lookup(foreignWord);
                     if (translation != null) {
-                        String language = words.getLanguageOfWord(wordToTranslate);
-                        System.out.println("The English translation of " + wordToTranslate + " (" + language + ") is: " + translation + "\n"); 
+                        String language = words.getLanguage(foreignWord);
+                        System.out.println("The English translation of " + foreignWord + " (" + language + ") is: " + translation + "\n"); 
                     } else {
                         System.out.println("Word not found in database.\n");
                     }
@@ -44,20 +44,20 @@ public class Main {
                         int correctCount = 0;
                         for (String quizItem : quizWords) {
                             String[] parts = quizItem.split("\\|");
-                            String foreignWord = parts[0];
+                            String foreign = parts[0];
                             String correctTranslation = parts[1];
                             
-                            System.out.println("Translate: " + foreignWord);
+                            System.out.println("Translate: " + foreign);
                             String userAnswer = scanner.next();
                             
                             if (userAnswer.equalsIgnoreCase(correctTranslation)) {
                                 System.out.println("Correct!\n");
                                 correctCount++;
-                                words.decrementLookupCount(Integer.parseInt(parts[2]));
+                                words.decrementLookup(Integer.parseInt(parts[2]));
                             } else {
                                 System.out.println("Incorrect. The correct translation is: " + correctTranslation + "\n");
                                 int wordIndex = Integer.parseInt(parts[2]);
-                                words.incrementLookupCount(wordIndex);
+                                words.incrementLookup(wordIndex);
                             }
                         }
                         System.out.println("Quiz complete! (" + correctCount + "/" + quizWords.length + ")\n");

@@ -33,7 +33,7 @@ public class Words {
         words.add(newWord);
     }
 
-    public String lookupWord(String foreignWord) {
+    public String lookup(String foreignWord) {
         for (int i = 0; i < words.size(); i++) {
             if (words.get(i).foreign.equalsIgnoreCase(foreignWord)) {
                 words.get(i).lookups++;
@@ -43,7 +43,7 @@ public class Words {
         return null;
     }
 
-    public String getLanguageOfWord(String foreignWord) {
+    public String getLanguage(String foreignWord) {
         for (int i = 0; i < words.size(); i++) {
             if (words.get(i).foreign.equalsIgnoreCase(foreignWord)) {
                 return words.get(i).language;
@@ -52,13 +52,13 @@ public class Words {
         return null;
     }
 
-    public void incrementLookupCount(int index) {
+    public void incrementLookup(int index) {
         if (index >= 0 && index < words.size()) {
             words.get(index).lookups++;
         }
     }
 
-    public void decrementLookupCount(int index) {
+    public void decrementLookup(int index) {
         if (index >= 0 && index < words.size()) {
             words.get(index).lookups = Math.max(0, words.get(index).lookups - 1);
         }
@@ -172,14 +172,14 @@ public class Words {
                     String[] parts = line.split("\\|");
                     if (parts.length == 4) {
                         String language = parts[0];
-                        String foreignWord = parts[1];
-                        String englishTranslation = parts[2];
+                        String foreign = parts[1];
+                        String english = parts[2];
                         int lookupCount = Integer.parseInt(parts[3]);
 
                         Word newWord = new Word();
                         newWord.language = language;
-                        newWord.foreign = foreignWord;
-                        newWord.english = englishTranslation;
+                        newWord.foreign = foreign;
+                        newWord.english = english;
                         newWord.lookups = lookupCount;
                         words.add(newWord);
                     } else {
