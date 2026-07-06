@@ -2,14 +2,12 @@ import java.util.*;
 import java.io.*;
 
 public class Words {
-    protected ArrayList<String[]> words;
-    protected ArrayList<Integer> lookupCounts;
+    protected ArrayList<Word> words;
     protected ArrayList<Integer> quizScores;
     private static String DATA_FILE = "parla_data.txt";
 
     public Words() {
-        words = new ArrayList<String[]>();
-        lookupCounts = new ArrayList<Integer>();
+        words = new ArrayList<Word>();
         quizScores = new ArrayList<Integer>();
         loadData();
     }
@@ -27,16 +25,19 @@ public class Words {
     }
 
     public void addWord(String language, String foreignWord, String englishTranslation) {
-        String[] newWord = {language, foreignWord, englishTranslation};
+        Word newWord = new Word();
+        newWord.language = language;
+        newWord.foreign = foreignWord;
+        newWord.english = englishTranslation;
+        newWord.lookups = 0;
         words.add(newWord);
-        lookupCounts.add(0);
     }
 
     public String lookupWord(String foreignWord) {
         for (int i = 0; i < words.size(); i++) {
-            if (words.get(i)[1].equalsIgnoreCase(foreignWord)) {
-                lookupCounts.set(i, lookupCounts.get(i) + 1);
-                return words.get(i)[2];
+            if (words.get(i).foreign.equalsIgnoreCase(foreignWord)) {
+                words.get(i).lookups++;
+                return words.get(i).english;
             }
         }
         return null;
@@ -44,22 +45,22 @@ public class Words {
 
     public String getLanguageOfWord(String foreignWord) {
         for (int i = 0; i < words.size(); i++) {
-            if (words.get(i)[1].equalsIgnoreCase(foreignWord)) {
-                return words.get(i)[0];
+            if (words.get(i).foreign.equalsIgnoreCase(foreignWord)) {
+                return words.get(i).language;
             }
         }
         return null;
     }
 
     public void incrementLookupCount(int index) {
-        if (index >= 0 && index < lookupCounts.size()) {
-            lookupCounts.set(index, lookupCounts.get(index) + 1);
+        if (index >= 0 && index < words.size()) {
+            words.get(index).lookups++;
         }
     }
 
     public void decrementLookupCount(int index) {
-        if (index >= 0 && index < lookupCounts.size()) {
-            lookupCounts.set(index, Math.max(0, lookupCounts.get(index) - 1));
+        if (index >= 0 && index < words.size()) {
+            words.get(index).lookups = Math.max(0, words.get(index).lookups - 1);
         }
     }
 
@@ -79,14 +80,14 @@ public class Words {
         int threshold = Math.max(1, maxLookups / 3);
 
         for (int i = 0; i < words.size(); i++) {
-            if (lookupCounts.get(i) > threshold) {
+            if (words.get(i).lookups > threshold) {
                 frequentIndices.add(i);
             } else {
                 rareIndices.add(i);
             }
         }
 
-        Collections.sort(frequentIndices, (a, b) -> lookupCounts.get(b).compareTo(lookupCounts.get(a)));
+        Collections.sort(frequentIndices, (a, b) -> words.get(b).lookups - words.get(a).lookups);
 
         Random rand = new Random();
 
@@ -109,7 +110,7 @@ public class Words {
         String[] quizWords = new String[selectedIndices.size()];
         for (int i = 0; i < selectedIndices.size(); i++) {
             int idx = selectedIndices.get(i);
-            quizWords[i] = words.get(idx)[1] + "|" + words.get(idx)[2] + "|" + idx;
+            quizWords[i] = words.get(idx).foreign + "|" + words.get(idx).english + "|" + idx;
         }
 
         return quizWords;
@@ -117,9 +118,9 @@ public class Words {
 
     private int getMaxLookups() {
         int max = 0;
-        for (int count : lookupCounts) {
-            if (count > max) {
-                max = count;
+        for (Word word : words) {
+            if (word.lookups > max) {
+                max = word.lookups;
             }
         }
         return max;
@@ -132,9 +133,8 @@ public class Words {
     public void saveData() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(DATA_FILE))) {
             for (int i = 0; i < words.size(); i++) {
-                String[] word = words.get(i);
-                int lookupCount = lookupCounts.get(i);
-                writer.println(word[0] + "|" + word[1] + "|" + word[2] + "|" + lookupCount);
+                Word word = words.get(i);
+                writer.println(word.language + "|" + word.foreign + "|" + word.english + "|" + word.lookups);
             }
             writer.println("QUIZ_SCORES");
             for (int score : quizScores) {
@@ -176,9 +176,14 @@ public class Words {
                         String englishTranslation = parts[2];
                         int lookupCount = Integer.parseInt(parts[3]);
 
-                        String[] newWord = {language, foreignWord, englishTranslation};
+                        Word newWord = new Word();
+                        newWord.language = language;
+                        newWord.foreign = foreignWord;
+                        newWord.english = englishTranslation;
+                        newWord.lookups = lookupCount;
                         words.add(newWord);
-                        lookupCounts.add(lookupCount);
+                    } else {
+                        System.err.println("Invalid data format: " + line);
                     }
                 }
             }
@@ -186,5 +191,4 @@ public class Words {
             System.err.println("Error loading data: " + e.getMessage());
         }
     }
-
 }

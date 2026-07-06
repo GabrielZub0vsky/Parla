@@ -11,14 +11,16 @@ public class Main {
 
             switch (cmd) {
                 case "add":
-                    for (int i = 0; i < 5; i++) {
+                    while(true) {
                         String language = scanner.next();
                         String foreignWord = scanner.next();
                         String englishTranslation = scanner.next();
                         if (words.isValid(foreignWord) && words.isValid(englishTranslation)) {
                             words.addWord(language, foreignWord, englishTranslation);
                         } else {
-                            System.out.println("Please enter a language, a word in that language, and its English translation, separated by 1 space: \n");
+                            System.out.println("Invalid input.\n");
+                            scanner.nextLine(); // Clear the invalid input
+                            break;
                         }
                     }
                     continue;   
@@ -31,11 +33,11 @@ public class Main {
                     } else {
                         System.out.println("Word not found in database.\n");
                     }
-
+                    continue;
                 case "quiz":
                     int numQuestions = scanner.nextInt();
-                    String[] quizWords = words.getQuizWords(numQuestions);
-                    
+                    String[] quizWords = (numQuestions >= 1) ? words.getQuizWords(numQuestions) : new String[0];
+
                     if (quizWords.length < 1) {
                         System.out.println("Not enough words to create a quiz.\n");
                     } else {
@@ -51,6 +53,7 @@ public class Main {
                             if (userAnswer.equalsIgnoreCase(correctTranslation)) {
                                 System.out.println("Correct!\n");
                                 correctCount++;
+                                words.decrementLookupCount(Integer.parseInt(parts[2]));
                             } else {
                                 System.out.println("Incorrect. The correct translation is: " + correctTranslation + "\n");
                                 int wordIndex = Integer.parseInt(parts[2]);
@@ -65,7 +68,7 @@ public class Main {
                     System.out.println("\nSaving progress...\n");
                     words.saveData();
                     scanner.close();
-                    break;
+                    return;
                 case "help":
                     System.out.println("Available commands:");
                     System.out.println("add [<language>] [<foreign_word>] [<english_translation>] - Add new words to the database.");
