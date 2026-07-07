@@ -27,7 +27,7 @@ Parla is a personal vocabulary management system designed for language learners.
 2. Navigate to the project directory
 3. Compile the Java files:
 ```bash
-   javac Main.java Words.java
+   javac *.java
 ```
 4. Run the program:
 ```bash

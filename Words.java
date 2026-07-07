@@ -130,6 +130,13 @@ public class Words {
         quizScores.add(score);
     }
 
+    public void displayStats() {
+        System.out.println("\n--- Statistics ---");
+        System.out.println("Total words in database: " + words.size());
+        System.out.println("Quiz scores: " + quizScores);
+        System.out.println("------------------\n");
+    }
+
     public void saveData() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(DATA_FILE))) {
             for (int i = 0; i < words.size(); i++) {

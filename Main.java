@@ -64,6 +64,9 @@ public class Main {
                         words.addQuizScore(correctCount);
                     }
                     continue;
+                case "stats":
+                    words.displayStats();
+                    continue;
                 case "exit":
                     System.out.println("\nSaving progress...\n");
                     words.saveData();
@@ -74,6 +77,7 @@ public class Main {
                     System.out.println("add [<language>] [<foreign_word>] [<english_translation>] - Add new words to the database.");
                     System.out.println("translate [<foreign_word>] - Translate a foreign word to English.");
                     System.out.println("quiz [<number_of_questions>] - Take a quiz on the words in the database.");
+                    System.out.println("stats - Display statistics about the words and quizzes.");
                     System.out.println("exit - Save progress and exit the program.");
                     System.out.println("help - Show this help message.");
                     continue;
