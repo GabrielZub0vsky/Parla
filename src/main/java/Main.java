@@ -1,5 +1,12 @@
 import java.util.*;
 
+/**
+ * Entry point for the Parla vocabulary application.
+ * <p>
+ * This class reads commands from the console and delegates word storage,
+ * translation, quiz management, and statistics display to the {@link Words}
+ * manager.
+ */
 public class Main {    
     public static void main(String[] args) {
         Words words = new Words();
@@ -62,9 +69,7 @@ public class Main {
                             }
                         }
                         System.out.println("Quiz complete! (" + correctCount + "/" + quizWords.length + ")\n");
-                        Quiz quiz = new Quiz();
-                        quiz.score = correctCount;
-                        quiz.numQuestions = quizWords.length;
+                        Quiz quiz = new Quiz(-1, correctCount, quizWords.length);
                         quiz.words = quizzedWords;
                         words.addQuiz(quiz);
                     }

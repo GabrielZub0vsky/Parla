@@ -13,25 +13,46 @@ Parla is a personal vocabulary management system designed for language learners.
 - **Smart Quizzing**: Get quizzed on words based on lookup frequency (harder words get more practice)
 - **Rare Word Testing**: Includes ~10% of rarely-looked-up words in quizzes to ensure you truly know them
 - **Progress Tracking**: Monitors how often you look up each word and tracks your quiz scores
-- **Data Persistence**: All words, lookup counts, and quiz scores are automatically saved to a file
+- **Data Persistence**: All words, lookup counts, and quiz scores are stored in a PostgreSQL database
 
 ## Installation
 
 ### Requirements
-- Java 8 or higher
+- Java 17 or higher
+- Maven
+- PostgreSQL database server
 - A terminal/command line interface
 
 ### Steps
 
 1. Clone or download the Parla repository
 2. Navigate to the project directory
-3. Compile the Java files:
+3. Build the project with Maven:
 ```bash
-   javac *.java
+   mvn compile
 ```
-4. Run the program:
+4. Run the program with Maven:
 ```bash
-   java Main
+   mvn exec:java
+```
+
+### PostgreSQL setup
+
+1. Start PostgreSQL and create the database:
+```bash
+   createdb parla
+```
+2. Create a dedicated user and grant privileges:
+```bash
+   createuser parla
+   psql -c "ALTER USER parla WITH PASSWORD 'parla'"
+   psql -c "GRANT ALL PRIVILEGES ON DATABASE parla TO parla"
+```
+3. Optionally override defaults using environment variables:
+```bash
+   export PARLA_DB_URL=jdbc:postgresql://localhost:5432/parla
+   export PARLA_DB_USER=parla
+   export PARLA_DB_PASSWORD=parla
 ```
 
 ## Usage
@@ -73,10 +94,15 @@ Parla uses a threshold-based algorithm to select quiz words:
 ## File Structure
 
 parla/
-├── Main.java          # Command-line interface
-├── Words.java         # Core vocabulary and quiz logic
-├── parla_data.txt     # Data storage (created on first exit)
-└── README.md          # This file
+├── pom.xml            # Maven project descriptor
+├── README.md          # This file
+├── src/main/java/
+│   ├── Main.java
+│   ├── Words.java
+│   ├── DatabaseHelper.java
+│   ├── Word.java
+│   └── Quiz.java
+└── src/main/resources/  # optional runtime resources
 
 
 ## Roadmap
